@@ -93,6 +93,8 @@ export default function MyButton({ children, ...props }) {
 }
 ```
 
+---
+
 ## Два подхода к обработке событий в React
 
 1. **Через управляемые компоненты useState**
@@ -117,3 +119,73 @@ const [post, setPost] = useState({ title: "", body: "" });
 // изменения в объекте стейта делаются пересборкой объекта с точечным затиранием требуемого свойства
 postSet({...post, title: e.target.value})
 ```
+
+## Передача колбека для изменения стейта вниз по иерарахии
+
+Т.к. передача пропса процесс однонаправленный, то если надо изменить стейт вышестоящего компонента, то вместо передачи новых пропсов вверх, что невозможно, нужно передать в нижестоящие компоненты callback который будет вызываться этими компонентами и будет менять стейт вышестоящего компонента.
+
+## Изменение массивов в React
+
+    - добавление нового элемента:
+      **setPosts([posts, ...]);**
+    - удаление элемента:
+      **setPosts(posts.filter(p => p.id !== post.id));**
+    - сортировка (немутабельная c предварительным копированием массива):
+      **setPosts([...posts].sort((a, b) => a[sort].localCompare(b[sort])))**
+
+## Условная отрисовка:
+
+пример:
+
+```jsx
+{
+  posts.length ? (
+    <PostList remove={removePost} posts={posts} title="Список постов" />
+  ) : (
+    <h1 style={{ textAlign: "center" }}>Посты не найдены!</h1>
+  );
+}
+```
+
+## Сортировка
+
+```js
+const getSortedPosts = () => {
+  console.log("Отработала getSortedPosts"); // для наглядности работы useMemo
+  if (selectedSort) {
+    return [...posts].sort((a, b) =>
+      a[selectedSort].localeCompare(b[selectedSort])
+    );
+  }
+  return posts;
+};
+
+const sortedPosts = useMemo(getSortedPosts, [selectedSort, posts]);
+```
+
+## Фильтрация
+
+```js
+const sortedAndSearchPosts = useMemo(() => {
+  return sortedPosts.filter(
+    (post) => post.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    [searchQuery, sortedPosts]
+  );
+});
+```
+
+## Модальные окна в реакте
+
+:warning: рассмотрен вариант работы с модификтором active в module css
+через использование массива с классами и их объединение
+
+```jsx
+const rootClasses = [cl.myModal];
+if (visible) {
+  rootClasses.push(cl.active);
+}
+
+<div className={rootClasses.join(" ")} onClick={() => setVisible(false)}>
+```
+
+:warning: для модальных окон так же может быть интересен метод **event.stopPropagation()** чтобы предотвратить обработку клика по контентной области которая приводит к закрытию окна.

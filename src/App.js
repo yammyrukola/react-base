@@ -1,46 +1,59 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import './styles/App.css';
 import PostList from './components/PostLits';
+import PostForm from './components/PostForm';
+import PostFilter from './components/PostFilter';
+import MyModal from './components/UI/modal/MyModal';
 import MyButton from './components/UI/button/MyButton';
-import MyInput from './components/UI/input/MyInput';
 
 function App() {
 
   const [posts, setPosts] = useState([
-    { id: 1, title: 'JavaScript 1', body: 'Description' },
-    { id: 2, title: 'JavaScript 2', body: 'Description' },
-    { id: 3, title: 'JavaScript 3', body: 'Description' },
+    { id: 1, title: 'ло JavaScript 1', body: 'уа Description' },
+    { id: 2, title: 'ав JavaScript 2', body: 'юя Description' },
+    { id: 3, title: 'ть JavaScript 3', body: 'ав Description' },
   ]);
 
-  // заменяем множество стейтов одним сейтом объктом post
-  // const [title, setTitle] = useState('');
-  // const [body, setBody] = useState('');
-  const [post, setPost] = useState({ title: '', body: '' });
+  const [filter, setFilter] = useState({ sort: '', query: '' });
+  const [modal, setModal] = useState(false);
 
-  const addNewPost = (e) => {
-    e.preventDefault();
-    const newPost = { id: crypto.randomUUID(), ...post };
-    // добавляем посты
+  const getSortedPosts = () => {
+    console.log('Отработала getSortedPosts'); // для наглядности работы useMemo
+    if (filter.sort) {
+      return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]));
+    }
+    return posts;
+  }
+
+  const sortedPosts = useMemo(getSortedPosts, [filter.sort, posts]);
+  const sortedAndSearchPosts = useMemo(
+    () => {
+      return sortedPosts.filter((post) => post.title.toLowerCase().includes(filter.query.toLowerCase()));
+    }, [filter.query, sortedPosts]);
+
+  const createPost = (newPost) => {
     setPosts([...posts, newPost]);
-    // setTitle(''); - старый вариант
-    // setBody(''); - старый вариант
+    setModal(false);
+  }
 
-    // обнуляем поля
-    setPost({ title: '', body: '' });
+  const removePost = (post) => {
+    setPosts(posts.filter(p => p.id !== post.id));
   }
 
   return (
+
     <div className="App">
-      <form>
-        {/* Управляемые компоненты с двойным связыванием + особенности изменения комплексного стейта в виде объекта*/}
-        <MyInput type="text" value={post.title} onChange={e => setPost({ ...post, title: e.target.value })} placeholder=" Название поста" />
-        <MyInput type="text" value={post.body} onChange={e => setPost({ ...post, body: e.target.value })} placeholder="Описание поста" />
-        {/* Пример неуправляемого компонента useRef + forwardRef в самом компонента*/}
-        {/* <MyInput ref={bodyInputRef} type="text" placeholder="Описание поста" /> */}
-        <MyButton onClick={addNewPost}>Создать пост</MyButton>
-      </form>
-      <PostList posts={posts} title="Список постов" />
-    </div>
+      <MyButton style={{ marginTop: '30px' }} onClick={() => setModal(true)}>Создать пост</MyButton>
+      <MyModal visible={modal} setVisible={setModal}>
+        <PostForm create={createPost} />
+      </MyModal>
+      {/* <PostForm create={createPost} /> */}
+      <hr style={{ margin: '15px 0' }} />
+      <div>
+        <PostFilter filter={filter} setFilter={setFilter} />
+        <PostList remove={removePost} posts={sortedAndSearchPosts} title="Список постов" />
+      </div>
+    </div >
   );
 }
 

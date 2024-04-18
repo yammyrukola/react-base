@@ -38,3 +38,18 @@ export default forwardRef(function MyInput(props, ref) {
 ```
 
 > :warning: манипуляции напрямую с DOM элементами в React не рекомендуются без особой необходимости.
+
+## useMemo (аналог computed свойств во Vue)
+
+**useMemo(callback, deps)**
+
+- _callback_ - мемоизируемая функция возвращающая результаты вычислений,
+- _deps_ - массив зависимостей, при изменении которых делается ревалидация кеша мемоизированного callback.
+
+Рассмотрен на примере отключения сортировки массива постов при каждом изменении строки поиска. В данном случае мемоизация используется, чтобы не изменять sortedPosts при каждом вводе символа в querySearch инпуте.
+
+```js
+const sortedPosts = useMemo(() => {
+  return [...posts].sort((a, b) => a[sort].localCompare(b[sort]));
+}, [selectedSort, posts]);
+```
