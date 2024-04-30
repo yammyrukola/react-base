@@ -6,9 +6,11 @@
   box-sizing: border-box;
 }
 
-:root {
+#root {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
 }
 
 .App {
@@ -22,4 +24,46 @@
   margin-top: 15px;
   justify-content: space-between;
   align-items: center;
+}
+
+.post__btns {
+  display: flex;
+}
+
+.post-enter {
+  transform: translate(-350px);
+}
+.post-enter-active {
+  transform: translateX(0);
+  transition: all 500ms ease-in;
+}
+.post-exit {
+  opacity: 1;
+}
+.post-exit-active {
+  transform: translateX(-350px);
+  transition: all 500ms ease-in;
+}
+
+.page__wrapper {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.navbar {
+  height: 50px;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  gap: 10px;
+  background-color: lightgray;
+}
+
+.navbar__links {
+  margin-left: auto;
 }

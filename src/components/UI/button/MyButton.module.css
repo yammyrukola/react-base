@@ -6,3 +6,8 @@
   border: 1px solid teal;
   cursor: pointer;
 }
+
+.myBtn_IsActive {
+  border: 2px solid orange;
+  font-weight: 700;
+}
